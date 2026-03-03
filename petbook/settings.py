@@ -137,8 +137,20 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 # Použití WhiteNoise pro extrémně rychlé servírování statických souborů v produkci
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-# Cloudinary konfigurace pro uživatelská média (profilovky, obrázky u tweetů)
+# Původní MEDIA_URL zůstává
 MEDIA_URL = '/media/'
+# Tvé nové rozkouskované nastavení
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME'),
+    'API_KEY': os.environ.get('CLOUDINARY_API_KEY'),
+    'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET'),
+    'UPLOAD_PRESET': os.environ.get('CLOUDINARY_UPLOAD_PRESET'), # Doporučuji přidat i toto
+    'MAGIC_ALIASES': {
+        'post_images': 'f_webp,q_auto,c_limit,w_1920',
+        'avatars': 'f_webp,q_auto,c_fill,w_400,h_400' # Avatary rovnou ořízneme na čtverec
+    }
+}
+
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
 # Nastavení pro produkční prostředí (aktivuje se jen když vypneš DEBUG)
