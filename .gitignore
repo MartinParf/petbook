@@ -1,0 +1,24 @@
+# Virtuální prostředí (vždy ignorovat, je příliš velké a vázané na váš systém)
+venv/
+.venv/
+env/
+
+# Citlivá data a konfigurace
+.env
+*.log
+
+# Python cache (zrychluje běh lokálně, ale v repozitáři jen překáží)
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Nastavení Cursoru / VS Code
+.vscode/
+.cursor/
+
+# Testy a distribuce
+.pytest_cache/
+.coverage
+dist/
+build/
+*.egg-info/
