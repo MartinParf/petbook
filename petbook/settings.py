@@ -33,10 +33,15 @@ SECRET_KEY = os.environ.get('SECRET_KEY')
 # Bude True jen tehdy, když je to v .env takto explicitně napsáno
 DEBUG = os.environ.get('DEBUG') == 'True'
 
-# V produkci (Fly.io) sem pak přidáme doménu našeho webu, při vývoji povolíme lokální server
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
-if not DEBUG:
-    ALLOWED_HOSTS += ['.fly.dev', 'petbook.fly.dev'] # Zde budou produkční domény
+# Povolíme lokální vývoj i produkční doménu na Fly.io
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'petbook.fly.dev']
+
+# DEVOPS PROAKTIVNÍ KROK: 
+# Protože Fly.io nasazuje automaticky HTTPS, Django formuláře (jako login) 
+# by bez tohoto nastavení vyhodily chybu "CSRF verification failed".
+CSRF_TRUSTED_ORIGINS = ['https://petbook.fly.dev']
+# TÍMTO ŘÍKÁME DJANGU: "Pokud ti Fly.io (proxy) pošle hlavičku X-Forwarded-Proto, věř mu, že je to HTTPS!"
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 
 # Application definition
@@ -60,6 +65,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -136,6 +142,8 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 STATIC_URL = 'static/'
+
+# TOTO JE KLÍČ PRO PRODUKCI (Zajistí, že se posbírá i CSS od Admina)
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # Použití WhiteNoise pro extrémně rychlé servírování statických souborů v produkci
