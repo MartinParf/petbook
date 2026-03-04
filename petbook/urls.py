@@ -23,7 +23,8 @@ ADMIN_PATH = os.environ.get('ADMIN_URL', 'fallback-secret-admin/')
 
 urlpatterns = [
     path(ADMIN_PATH, admin.site.urls),
-    
-    # Načte všechny cesty z aplikace tweets hned na hlavní doméně (/)
     path('', include('tweets.urls')),
+    
+    # NOVÉ: Zapojení uživatelských cest
+    path('users/', include('users.urls')),
 ]

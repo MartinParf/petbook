@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Your Pet's Profile{% endblock %}
+
+{% block content %}
+<div class="flex flex-col gap-10">
+    
+    <div class="w-full max-w-2xl mx-auto bg-white/80 dark:bg-softdark-light/80 backdrop-blur-md rounded-3xl p-8 shadow-lg border border-cream-dark dark:border-softdark-border relative overflow-hidden">
+        
+        <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-accent to-yellow-400"></div>
+
+        <div class="text-center mb-8 mt-2">
+            <h1 class="text-3xl font-extrabold text-stone-900 dark:text-white tracking-tight mb-2">Edit Your Profile ✏️</h1>
+            <p class="text-stone-500 dark:text-stone-400">Update details about {{ request.user.pet_name|default:request.user.username }}.</p>
+        </div>
+
+        <form method="POST" enctype="multipart/form-data" class="space-y-6">
+            {% csrf_token %}
+            
+            {% if form.errors %}
+            <div class="bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 p-4 rounded-xl text-sm font-medium border border-red-200 dark:border-red-800">
+                Please correct the errors below.
+            </div>
+            {% endif %}
+
+            <div class="space-y-5">
+                <h3 class="text-xl font-bold text-stone-900 dark:text-white border-b border-cream-dark dark:border-softdark-border pb-2">Basic Info</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div class="flex flex-col gap-1.5">{{ form.pet_name.label_tag }}{{ form.pet_name }}</div>
+                    <div class="flex flex-col gap-1.5">{{ form.pet_type.label_tag }}{{ form.pet_type }}</div>
+                </div>
+                <div class="flex flex-col gap-1.5">{{ form.avatar.label_tag }}{{ form.avatar }}</div>
+                <div class="flex flex-col gap-1.5">{{ form.bio.label_tag }}{{ form.bio }}</div>
+                <div class="flex flex-col gap-1.5">{{ form.location.label_tag }}{{ form.location }}</div>
+            </div>
+
+            <div class="space-y-5 pt-4">
+                <h3 class="text-xl font-bold text-stone-900 dark:text-white border-b border-cream-dark dark:border-softdark-border pb-2">Physical Details</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div class="flex flex-col gap-1.5">{{ form.birth_date.label_tag }}{{ form.birth_date }}</div>
+                    <div class="flex flex-col gap-1.5">{{ form.breed.label_tag }}{{ form.breed }}</div>
+                    <div class="flex flex-col gap-1.5">{{ form.fur_color.label_tag }}{{ form.fur_color }}</div>
+                    <div class="flex flex-col gap-1.5">{{ form.eye_color.label_tag }}{{ form.eye_color }}</div>
+                </div>
+            </div>
+
+            <div class="space-y-5 pt-4 pb-4">
+                <h3 class="text-xl font-bold text-stone-900 dark:text-white border-b border-cream-dark dark:border-softdark-border pb-2">Personality & Favs</h3>
+                <div class="flex flex-col gap-1.5">{{ form.personality_traits.label_tag }}{{ form.personality_traits }}</div>
+                <div class="flex flex-col gap-1.5">{{ form.favorite_food.label_tag }}{{ form.favorite_food }}</div>
+                <div class="flex flex-col gap-1.5">{{ form.favorite_activities.label_tag }}{{ form.favorite_activities }}</div>
+            </div>
+
+            <button type="submit" class="w-full bg-accent hover:bg-accent-hover text-white font-bold py-3.5 px-6 rounded-xl shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all block text-center">
+                Save Changes
+            </button>
+        </form>
+    </div>
+
+    <div class="pt-8 border-t border-cream-dark dark:border-softdark-border">
+        <h2 class="text-2xl font-extrabold text-stone-900 dark:text-white mb-6 text-center">Your Portfolio</h2>
+        {% include 'tweets/gallery.html' with target_user=request.user %}
+    </div>
+
+</div>
+{% endblock %}

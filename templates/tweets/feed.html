@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+
+{% block title %}Feed{% endblock %}
+
+{% block content %}
+
+{% if request.user.is_authenticated %}
+<div class="bg-white dark:bg-softdark-light rounded-3xl p-5 md:p-6 shadow-sm border border-cream-dark dark:border-softdark-border mb-8 transition-shadow hover:shadow-md">
+    <form action="{% url 'tweets:create_post' %}" method="POST" enctype="multipart/form-data" class="flex gap-4">
+        {% csrf_token %}
+        
+        <div class="flex-shrink-0">
+            {% if request.user.avatar %}
+                <img src="{{ request.user.avatar.url }}" alt="Avatar" class="w-12 h-12 rounded-full object-cover border-2 border-cream dark:border-softdark">
+            {% else %}
+                <div class="w-12 h-12 rounded-full bg-cream-dark dark:bg-softdark flex items-center justify-center text-accent font-bold text-xl">
+                    {{ request.user.pet_name|first|default:request.user.username|first|upper }}
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="flex-grow flex flex-col gap-3">
+            <textarea name="content" rows="2" required
+                      placeholder="What is {{ request.user.pet_name|default:request.user.username }} thinking about today? Share it with us! ✨" 
+                      class="w-full bg-transparent text-lg md:text-xl placeholder-stone-400 dark:placeholder-stone-500 text-stone-800 dark:text-stone-200 resize-none focus:outline-none focus:ring-0 p-2"></textarea>
+            
+            <div class="flex items-center justify-between pt-3 border-t border-cream-dark dark:border-softdark-border">
+                <label class="cursor-pointer flex items-center gap-2 text-stone-500 hover:text-accent dark:hover:text-accent transition-colors px-3 py-2 rounded-xl hover:bg-cream dark:hover:bg-softdark">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                    <span class="text-sm font-medium">Add Photo</span>
+                    <input type="file" name="image" accept="image/*" class="hidden">
+                </label>
+
+                <button type="submit" class="bg-accent hover:bg-accent-hover text-white font-semibold py-2 px-6 rounded-full shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all">
+                    Post
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+{% endif %}
+
+<div class="flex flex-col gap-6">
+    {% for post in page_obj %}
+        <article class="bg-white dark:bg-softdark-light rounded-3xl p-5 md:p-6 shadow-sm border border-cream-dark dark:border-softdark-border transition-all hover:shadow-md">
+            
+            <div class="flex items-center gap-3 mb-4">
+                <a href="{% url 'tweets:user_gallery' post.author.username %}" class="flex-shrink-0">
+                    {% if post.author.avatar %}
+                        <img src="{{ post.author.avatar.url }}" alt="Avatar" class="w-12 h-12 rounded-full object-cover">
+                    {% else %}
+                        <div class="w-12 h-12 rounded-full bg-cream-dark dark:bg-softdark flex items-center justify-center text-accent font-bold text-xl">
+                            {{ post.author.pet_name|first|default:post.author.username|first|upper }}
+                        </div>
+                    {% endif %}
+                </a>
+                <div class="flex flex-col">
+                    <a href="{% url 'tweets:user_gallery' post.author.username %}" class="font-bold text-stone-900 dark:text-white hover:underline decoration-accent">
+                        {{ post.author.pet_name|default:post.author.username }}
+                    </a>
+                    <span class="text-sm text-stone-500 dark:text-stone-400">
+                        @{{ post.author.username }} • {{ post.created_at|timesince }} ago
+                        {% if post.author.pet_type %} · {{ post.author.pet_type }}{% endif %}
+                    </span>
+                </div>
+            </div>
+
+            {% if post.content %}
+                <p class="text-stone-800 dark:text-stone-200 text-lg mb-4 whitespace-pre-wrap leading-relaxed">{{ post.content }}</p>
+            {% endif %}
+
+            {% if post.image %}
+                <div class="mt-2 mb-4 rounded-2xl overflow-hidden border border-cream-dark dark:border-softdark-border">
+                    <img src="{{ post.image.url }}" alt="Post image" class="w-full max-h-[500px] object-cover hover:scale-[1.02] transition-transform duration-500">
+                </div>
+            {% endif %}
+
+            <div class="flex items-center gap-6 mt-4 pt-4 border-t border-cream-dark dark:border-softdark-border text-stone-500 dark:text-stone-400">
+                <button class="flex items-center gap-2 hover:text-accent transition-colors group">
+                    <div class="p-2 rounded-full group-hover:bg-accent/10 transition-colors">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
+                    </div>
+                    <span class="font-medium">{{ post.likes.count }}</span>
+                </button>
+                <button class="flex items-center gap-2 hover:text-blue-500 transition-colors group">
+                    <div class="p-2 rounded-full group-hover:bg-blue-500/10 transition-colors">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
+                    </div>
+                    <span class="font-medium">{{ post.comments.count }}</span>
+                </button>
+            </div>
+        </article>
+    {% empty %}
+        <div class="text-center py-12 text-stone-500 dark:text-stone-400 bg-white dark:bg-softdark-light rounded-3xl shadow-sm border border-cream-dark dark:border-softdark-border">
+            <svg class="w-16 h-16 mx-auto mb-4 text-stone-300 dark:text-stone-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path></svg>
+            <p class="text-xl font-medium">It's quiet here...</p>
+            <p class="mt-1">Be the first one to share a moment!</p>
+        </div>
+    {% endfor %}
+</div>
+
+{% if page_obj.has_next %}
+<div class="mt-10 mb-8 flex justify-center">
+    <a href="?page={{ page_obj.next_page_number }}" class="group relative inline-flex items-center justify-center px-8 py-3 font-semibold text-accent dark:text-accent-hover bg-cream-dark dark:bg-softdark-border rounded-full overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-md focus:outline-none">
+        <span class="absolute w-0 h-0 transition-all duration-300 ease-out bg-accent rounded-full group-hover:w-full group-hover:h-56 opacity-10"></span>
+        <span class="relative flex items-center gap-2">
+            Show me more
+            <svg class="w-5 h-5 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+        </span>
+    </a>
+</div>
+{% endif %}
+
+{% endblock %}

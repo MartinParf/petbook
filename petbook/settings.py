@@ -71,10 +71,12 @@ ROOT_URLCONF = 'petbook.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        # PŘIDÁNO: Zde říkáme Djangu, aby hledal šablony v hlavní složce 'templates'
+        'DIRS': [BASE_DIR / 'templates'], 
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
+                'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
@@ -137,8 +139,18 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 # Použití WhiteNoise pro extrémně rychlé servírování statických souborů v produkci
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-# Původní MEDIA_URL zůstává
-MEDIA_URL = '/media/'
+# Původní MEDIA_URL zůstává,  MEDIA_URL = '/media/'
+
+STORAGES = {
+    "default": {
+        "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
+
+
 # Tvé nové rozkouskované nastavení
 CLOUDINARY_STORAGE = {
     'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME'),
