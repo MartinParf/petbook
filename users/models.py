@@ -2,7 +2,10 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 
 class CustomUser(AbstractUser):
-    cat_name = models.CharField(max_length=50, blank=True)
+    # Přidáno pet_type a přejmenováno na pet_name
+    pet_type = models.CharField(max_length=50, blank=True) # např. Dog, Cat, Guinea Pig
+    pet_name = models.CharField(max_length=50, blank=True) # např. Olivia
+
     avatar = models.ImageField(upload_to='avatars/', blank=True, null=True)
     bio = models.TextField(max_length=500, blank=True)
     location = models.CharField(max_length=100, blank=True)
@@ -19,4 +22,6 @@ class CustomUser(AbstractUser):
     is_verified = models.BooleanField(default=False)
 
     def __str__(self):
-        return f"@{self.username}"
+        # Nyní to v administraci ukáže např.: @olivia_the_brit (Cat - Olivia)
+        type_and_name = f" ({self.pet_type} - {self.pet_name})" if self.pet_type or self.pet_name else ""
+        return f"@{self.username}{type_and_name}"
