@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_GET
 from django_ratelimit.decorators import ratelimit
 from django.contrib.auth import get_user_model
-from .models import Post
+from .models import Post, Like, Comment
 from .forms import PostForm
 
 User = get_user_model()
@@ -53,10 +53,48 @@ def create_post_view(request):
             new_post.save()
             
             # Pokud nahrál obrázek, přesměrujeme ho do jeho galerie, jinak na zeď
-            if new_post.image:
-                return redirect('tweets:user_gallery', username=request.user.username)
+            #if new_post.image:
+            #    return redirect('tweets:user_gallery', username=request.user.username)
             return redirect('tweets:feed')
     else:
         form = PostForm()
         
     return render(request, 'tweets/create_post.html', {'form': form})
+
+# Logika pro přidání/odebrání lajku
+@login_required(login_url='users:login')
+def toggle_like_view(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
+    # Pokusí se vytvořit lajk. Pokud už existuje, smaže ho (tzv. toggle)
+    like, created = Like.objects.get_or_create(user=request.user, post=post)
+    if not created:
+        like.delete()
+    
+    # HTTP_REFERER nás šikovně vrátí přesně tam, odkud uživatel kliknul (Zpět na zeď nebo do galerie)
+    return redirect(request.META.get('HTTP_REFERER', 'tweets:feed'))
+
+# Logika pro přidání komentáře
+@login_required(login_url='users:login')
+@ratelimit(key='user', rate='10/m', block=True)
+def add_comment_view(request, post_id):
+    if request.method == 'POST':
+        post = get_object_or_404(Post, id=post_id)
+        content = request.POST.get('content')
+        if content:
+            Comment.objects.create(post=post, author=request.user, content=content)
+            
+    return redirect(request.META.get('HTTP_REFERER', 'tweets:feed'))
+
+@login_required(login_url='users:login')
+def delete_post_view(request, post_id):
+    # Najde příspěvek. DŮLEŽITÉ: Přidali jsme 'author=request.user'. 
+    # To je SecOps pojistka! Znamená to, že hacker nemůže smazat cizí příspěvek, 
+    # i kdyby uhodl jeho ID, protože databáze ověří, že mu příspěvek patří.
+    post = get_object_or_404(Post, id=post_id, author=request.user)
+    
+    if request.method == 'POST':
+        post.delete()
+        # Přesměruje uživatele zpět tam, odkud smazání odklikl (Zeď nebo Galerie)
+        return redirect(request.META.get('HTTP_REFERER', 'tweets:feed'))
+        
+    return redirect('tweets:feed')

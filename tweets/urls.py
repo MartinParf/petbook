@@ -13,4 +13,10 @@ urlpatterns = [
     # 3. Kočičí galerie - dynamická URL, kde <str:username> zachytí jméno kočky
     # Příklad: tvujweb.cz/gallery/olivia_the_brit/
     path('gallery/<str:username>/', views.user_gallery_view, name='user_gallery'),
+
+    # NOVÉ CESTY PRO LAJKY A KOMENTÁŘE
+    path('post/<int:post_id>/like/', views.toggle_like_view, name='toggle_like'),
+    path('post/<int:post_id>/comment/', views.add_comment_view, name='add_comment'),
+    path('post/<int:post_id>/delete/', views.delete_post_view, name='delete_post'),
+
 ]

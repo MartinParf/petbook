@@ -1,4 +1,5 @@
 from django.contrib.auth.models import AbstractUser
+from cloudinary.models import CloudinaryField
 from django.db import models
 
 class CustomUser(AbstractUser):
@@ -6,7 +7,17 @@ class CustomUser(AbstractUser):
     pet_type = models.CharField(max_length=50, blank=True) # např. Dog, Cat, Guinea Pig
     pet_name = models.CharField(max_length=50, blank=True) # např. Olivia
 
-    avatar = models.ImageField(upload_to='avatars/', blank=True, null=True)
+    avatar = CloudinaryField(
+        'avatar',
+        folder='avatars',
+        format='webp',
+        transformation=[
+            {'width': 400, 'height': 400, 'crop': 'fill', 'gravity': 'face', 'quality': 'auto'}
+        ],
+        blank=True, null=True
+    )
+
+
     bio = models.TextField(max_length=500, blank=True)
     location = models.CharField(max_length=100, blank=True)
     

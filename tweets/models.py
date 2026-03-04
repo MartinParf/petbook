@@ -1,5 +1,6 @@
 from django.db import models
 from django.conf import settings
+from cloudinary.models import CloudinaryField
 
 class Post(models.Model):
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='posts')
@@ -11,7 +12,17 @@ class Post(models.Model):
     content = models.TextField(max_length=2000, blank=True)
     
     # Fotka (pokud je vyplněna, příspěvek se automaticky ukáže i v galerii uživatele)
-    image = models.ImageField(upload_to='post_images/', blank=True, null=True)
+    # NOVÉ: Ultimátní Cloudinary pole
+    image = CloudinaryField(
+        'image', 
+        folder='post_images', # Složka přímo na Cloudinary
+        format='webp',        # Vynucený moderní formát
+        transformation=[
+            # Fotka se při uploadu fyzicky zmenší na max šířku 1920px a kvalita se automaticky optimalizuje
+            {'width': 1920, 'crop': 'limit', 'quality': 'auto'}
+        ],
+        blank=True, null=True
+    )
     
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
