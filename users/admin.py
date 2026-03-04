@@ -11,7 +11,7 @@ class CustomUserAdmin(UserAdmin):
         ('Pet Profile Details', {'fields': ('pet_type', 'pet_name', 'avatar', 'bio', 'location')}),
         ('Physical Attributes', {'fields': ('birth_date', 'breed', 'fur_color', 'eye_color')}),
         ('Preferences & Personality', {'fields': ('personality_traits', 'favorite_food', 'favorite_activities')}),
-        ('System', {'fields': ('is_verified',)}),
+        ('System', {'fields': ('is_verified',)}), 
     )
 
 admin.site.register(CustomUser, CustomUserAdmin)
