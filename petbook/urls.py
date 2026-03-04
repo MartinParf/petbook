@@ -18,13 +18,18 @@ import os
 from django.contrib import admin
 from django.urls import path, include
 
+#def trigger_error(request):    # Vypnuto pro produkci
+#    division_by_zero = 1 / 0
+
 # Bezpečné načtení URL z trezoru. Pokud chybí, použije se záložní, ale stále skrytá cesta.
 ADMIN_PATH = os.environ.get('ADMIN_URL', 'fallback-secret-admin/')
 
 urlpatterns = [
     path(ADMIN_PATH, admin.site.urls),
+    #path('sentry-debug/', trigger_error),  # Vypnuto pro produkci
     path('', include('tweets.urls')),
     
     # NOVÉ: Zapojení uživatelských cest
     path('users/', include('users.urls')),
 ]
+

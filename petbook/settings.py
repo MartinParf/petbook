@@ -14,6 +14,8 @@ from pathlib import Path
 import os
 from dotenv import load_dotenv
 import dj_database_url
+import sentry_sdk
+
 
 # Načtení environmentálních proměnných z .env souboru
 load_dotenv()
@@ -175,3 +177,15 @@ if not DEBUG:
 
 # Definice našeho vlastního uživatelského modelu (Aplikace.Model)
 AUTH_USER_MODEL = 'users.CustomUser'
+
+# DSN načteme bezpečně z .env (na GitHubu z GitHub Secrets)
+SENTRY_DSN = os.environ.get('SENTRY_DSN')
+
+if SENTRY_DSN:
+    sentry_sdk.init(
+        dsn=SENTRY_DSN,
+        # Sledujeme 100% chyb a 20% výkonnostních metrik (Performance Monitoring)
+        traces_sample_rate=0.2,
+        profiles_sample_rate=0.2,
+    )
+
