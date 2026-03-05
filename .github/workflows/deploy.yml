@@ -1,0 +1,28 @@
+name: Deploy PetNet to Fly.io
+
+# Kdy se má tento robot probudit?
+on:
+  push:
+    branches:
+      - main  # Spustí se jen když pošleš kód do hlavní větve (main/master)
+
+# Co má dělat?
+jobs:
+  deploy:
+    name: Deploy app
+    runs-on: ubuntu-latest # Robot si pronajme tento Linuxový server
+    
+    steps:
+      # Krok 1: Robot si stáhne tvůj nejnovější kód z GitHubu
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      # Krok 2: Robot si nainstaluje nástroj flyctl
+      - name: Setup Flyctl
+        uses: superfly/flyctl-actions/setup-flyctl@master
+        
+      # Krok 3: Robot provede deploy. Použije k tomu heslo, které jsme mu schovali!
+      - name: Deploy to Fly.io
+        run: flyctl deploy --remote-only
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
