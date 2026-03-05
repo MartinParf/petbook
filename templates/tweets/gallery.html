@@ -13,7 +13,6 @@
         activePostId: null,
         isOwner: {% if request.user == target_user %}true{% else %}false{% endif %},
         
-        // Upravená funkce: Přijímá i postId
         openLightbox(img, title, content, likes, comments, postId) {
             this.activeImage = img;
             this.activeTitle = title;
@@ -30,8 +29,9 @@
         }
     }">
 
-    <div class="bg-white dark:bg-softdark-light rounded-3xl p-6 md:p-8 shadow-sm border border-cream-dark dark:border-softdark-border mb-10 flex flex-col md:flex-row items-center md:items-start gap-6 relative overflow-hidden">
+    <div class="bg-white dark:bg-softdark-light rounded-3xl p-6 md:p-8 shadow-sm border border-cream-dark dark:border-softdark-border mb-8 flex flex-col md:flex-row items-center md:items-start gap-6 relative overflow-hidden">
         <div class="absolute top-0 left-0 w-full h-24 bg-gradient-to-r from-accent/20 to-cream dark:from-accent/10 dark:to-softdark opacity-50"></div>
+        
         <div class="relative z-10 flex-shrink-0">
             {% if target_user.avatar %}
                 <img src="{{ target_user.avatar.url }}" alt="Avatar" class="w-32 h-32 md:w-40 md:h-40 rounded-full object-cover border-4 border-white dark:border-softdark shadow-lg">
@@ -41,10 +41,72 @@
                 </div>
             {% endif %}
         </div>
+        
         <div class="relative z-10 flex-grow text-center md:text-left w-full mt-2 md:mt-4">
             <h1 class="text-3xl font-extrabold text-stone-900 dark:text-white">{{ target_user.pet_name|default:target_user.username }}</h1>
-            <p class="text-stone-500 dark:text-stone-400 font-medium mb-4">@{{ target_user.username }} {% if target_user.pet_type %}• {{ target_user.pet_type }}{% endif %}</p>
-            {% if target_user.bio %}<p class="text-stone-700 dark:text-stone-300 mb-4 max-w-xl">{{ target_user.bio }}</p>{% endif %}
+            <p class="text-stone-500 dark:text-stone-400 font-medium mb-3">@{{ target_user.username }}</p>
+            
+            {% if target_user.bio %}
+                <p class="text-stone-700 dark:text-stone-300 mb-4 max-w-xl mx-auto md:mx-0">{{ target_user.bio }}</p>
+            {% endif %}
+
+            <div class="flex flex-col gap-2 mt-2">
+                
+                <div class="flex flex-wrap justify-center md:justify-start gap-1.5">
+                    {% if target_user.pet_type %}
+                        <span class="px-2.5 py-0.5 bg-accent/10 text-accent font-semibold rounded-md text-xs md:text-sm border border-accent/20 flex items-center gap-1">
+                            🐾 {{ target_user.pet_type }}
+                        </span>
+                    {% endif %}
+                    {% if target_user.breed %}
+                        <span class="px-2.5 py-0.5 bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 font-medium rounded-md text-xs md:text-sm border border-stone-200 dark:border-stone-700 flex items-center gap-1">
+                            🏷️ {{ target_user.breed }}
+                        </span>
+                    {% endif %}
+                    {% if target_user.color %}
+                        <span class="px-2.5 py-0.5 bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 font-medium rounded-md text-xs md:text-sm border border-stone-200 dark:border-stone-700 flex items-center gap-1">
+                            🎨 Fur: {{ target_user.color }}
+                        </span>
+                    {% endif %}
+                    {% if target_user.eye_color %}
+                        <span class="px-2.5 py-0.5 bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 font-medium rounded-md text-xs md:text-sm border border-stone-200 dark:border-stone-700 flex items-center gap-1">
+                            👁️ Eyes: {{ target_user.eye_color }}
+                        </span>
+                    {% endif %}
+                </div>
+
+                <div class="flex flex-wrap justify-center md:justify-start gap-1.5">
+                    {% if target_user.location %}
+                        <span class="px-2.5 py-0.5 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 font-medium rounded-md text-xs md:text-sm border border-blue-100 dark:border-blue-800 flex items-center gap-1">
+                            📍 {{ target_user.location }}
+                        </span>
+                    {% endif %}
+                    {% if target_user.birth_date %}
+                        <span class="px-2.5 py-0.5 bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 font-medium rounded-md text-xs md:text-sm border border-purple-100 dark:border-purple-800 flex items-center gap-1">
+                            🎂 {{ target_user.birth_date|timesince }} old
+                        </span>
+                    {% endif %}
+                </div>
+
+                <div class="flex flex-wrap justify-center md:justify-start gap-1.5">
+                    {% if target_user.personality_traits %}
+                        <span class="px-2.5 py-0.5 bg-orange-50 dark:bg-orange-900/20 text-orange-600 dark:text-orange-400 font-medium rounded-md text-xs md:text-sm border border-orange-100 dark:border-orange-800 flex items-center gap-1">
+                            🎭 {{ target_user.personality_traits }}
+                        </span>
+                    {% endif %}
+                    {% if target_user.favorite_food %}
+                        <span class="px-2.5 py-0.5 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 font-medium rounded-md text-xs md:text-sm border border-emerald-100 dark:border-emerald-800 flex items-center gap-1">
+                            🥩 Loves: {{ target_user.favorite_food }}
+                        </span>
+                    {% endif %}
+                    {% if target_user.favorite_activities %}
+                        <span class="px-2.5 py-0.5 bg-rose-50 dark:bg-rose-900/20 text-rose-600 dark:text-rose-400 font-medium rounded-md text-xs md:text-sm border border-rose-100 dark:border-rose-800 flex items-center gap-1">
+                            🎾 Plays: {{ target_user.favorite_activities }}
+                        </span>
+                    {% endif %}
+                </div>
+
+            </div>
         </div>
     </div>
 
