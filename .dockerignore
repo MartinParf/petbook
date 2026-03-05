@@ -4,3 +4,6 @@ fly.toml
 venv
 .env
 .gitignore
+__pycache__/
+.dockerignore
+.pytest_cache/
