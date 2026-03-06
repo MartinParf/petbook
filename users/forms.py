@@ -10,7 +10,7 @@ COMMON_INPUT_CLASSES = 'w-full bg-cream dark:bg-softdark border border-cream-dar
 class CustomUserCreationForm(UserCreationForm):
     class Meta(UserCreationForm.Meta):
         model = CustomUser
-        # Pro maximální UX rychlost chceme při registraci jen jméno. Hesla si Django přidá samo.
+        # Pro maximální UX rychlost chceme při registraci jen jméno. Hesla si Django přidá samo. Test
         fields = ('username',)
         
     def __init__(self, *args, **kwargs):
