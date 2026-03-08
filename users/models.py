@@ -6,6 +6,12 @@ class CustomUser(AbstractUser):
     # Přidáno pet_type a přejmenováno na pet_name
     pet_type = models.CharField(max_length=50, blank=True) # např. Dog, Cat, Guinea Pig
     pet_name = models.CharField(max_length=50, blank=True) # např. Olivia
+    
+    
+    # Přidáme toto: E-mail je teď povinný a absolutně unikátní
+    email = models.EmailField(unique=True, blank=False, null=False) 
+    
+    # ... tvé stávající pole (pet_name, pet_type, avatar atd.) zůstávají beze změny! ...
 
     avatar = CloudinaryField(
         'avatar',
