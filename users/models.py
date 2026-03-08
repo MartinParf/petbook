@@ -11,7 +11,7 @@ class CustomUser(AbstractUser):
     # Přidáme toto: E-mail je teď povinný a absolutně unikátní
     email = models.EmailField(unique=True, blank=False, null=False) 
     
-    # ... tvé stávající pole (pet_name, pet_type, avatar atd.) zůstávají beze změny! ....
+    # ... tvé stávající pole (pet_name, pet_type, avatar atd.) zůstávají beze změny! .....
 
     avatar = CloudinaryField(
         'avatar',
