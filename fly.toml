@@ -9,7 +9,7 @@ console_command = '/code/manage.py shell'
 
 [processes]
   # Náš hlavní webový server (který HTTP service už zná jako 'app')
-  app = "gunicorn twitter_project.wsgi:application --bind 0.0.0.0:8000"
+  app = "gunicorn petbook.wsgi:application --bind 0.0.0.0:8000"
   
   # Náš nový Celery dělník
   worker = "celery -A petbook worker -l INFO"
