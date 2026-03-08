@@ -1,5 +1,5 @@
 from django import forms
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, UserChangeForm
 from django.core.exceptions import ValidationError
 from .models import CustomUser
 
@@ -11,12 +11,15 @@ class CustomUserCreationForm(UserCreationForm):
     class Meta(UserCreationForm.Meta):
         model = CustomUser
         # Pro maximální UX rychlost chceme při registraci jen jméno. Hesla si Django přidá samo. Test
-        fields = ('username',)
+        #fields = ('username',) # zde zakomentováno, aby se přidalo více polí
+        fields = ('username', 'email', 'pet_name', 'pet_type')
         
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for field in self.fields.values():
             field.widget.attrs.update({'class': COMMON_INPUT_CLASSES})
+
+        self.fields['email'].widget.attrs.update({'placeholder': 'you@example.com'})
 
 class CustomAuthenticationForm(AuthenticationForm):
     def __init__(self, *args, **kwargs):

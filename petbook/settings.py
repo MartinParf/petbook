@@ -197,3 +197,8 @@ if SENTRY_DSN:
         profiles_sample_rate=0.2,
     )
 
+# Vlastní přihlašování (Username NEBO E-mail)
+AUTHENTICATION_BACKENDS = [
+    'users.backends.EmailOrUsernameModelBackend',
+    'django.contrib.auth.backends.ModelBackend',
+]

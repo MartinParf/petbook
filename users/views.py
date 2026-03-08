@@ -7,7 +7,6 @@ from django.contrib.auth.decorators import login_required
 # OMEZENÍ: Z jedné IP adresy max 5 pokusů o registraci za hodinu (Zastaví botnety)
 @ratelimit(key='ip', rate='5/h', block=True)
 def register_view(request):
-    # Pokud už je uživatel přihlášený, nemá tu co dělat
     if request.user.is_authenticated:
         return redirect('tweets:feed')
 
@@ -15,7 +14,10 @@ def register_view(request):
         form = CustomUserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
-            login(request, user) # Automaticky ho přihlásíme po úspěšné registraci
+            
+            # TADY JE TA OPRAVA: Natvrdo řekneme, jaký backend se má pro relaci použít
+            login(request, user, backend='users.backends.EmailOrUsernameModelBackend')
+            
             return redirect('tweets:feed')
     else:
         form = CustomUserCreationForm()
