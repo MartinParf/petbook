@@ -57,14 +57,22 @@ class UserProfileForm(forms.ModelForm):
     # BEZPEČNOST: Kontrola nahraného Avatara
     def clean_avatar(self):
         avatar = self.cleaned_data.get('avatar')
-        if avatar:
-            # 20 MB limit pro Avatara
-            max_size_mb = 20
+        
+        # Ochrana: Kontrolujeme velikost a typ JEN tehdy, když se nahrává úplně nový soubor z PC.
+        # (Nový soubor má atribut 'size'. Existující CloudinaryResource ho nemá.)
+        if avatar and hasattr(avatar, 'size'):
+            
+            # 10 MB limit pro Avatara (Rozumný kompromis)
+            max_size_mb = 10
             if avatar.size > max_size_mb * 1024 * 1024:
+                from django.core.exceptions import ValidationError # Pro jistotu import, kdyby chyběl nahoře
                 raise ValidationError(f"Avatar is too large. Maximum size is {max_size_mb}MB.")
             
             # Whitelist typů souborů
             valid_extensions = ['image/jpeg', 'image/png', 'image/webp', 'image/gif']
-            if avatar.content_type not in valid_extensions:
+            # Kontrolujeme i content_type, takže to bezpečně schováme pod tuto podmínku
+            if hasattr(avatar, 'content_type') and avatar.content_type not in valid_extensions:
+                from django.core.exceptions import ValidationError
                 raise ValidationError("Invalid format. Please upload JPEG, PNG, WEBP, or GIF.")
+                
         return avatar

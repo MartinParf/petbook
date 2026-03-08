@@ -29,7 +29,8 @@ class PostForm(forms.ModelForm):
     def clean_image(self):
         image = self.cleaned_data.get('image')
         
-        if image:
+        # Bezpečnostní pojistka: Kontroluj jen nové soubory z PC (mají atribut 'size')
+        if image and hasattr(image, 'size'):
             # 20 MB limit
             max_size_mb = 20
             if image.size > max_size_mb * 1024 * 1024:
@@ -37,7 +38,7 @@ class PostForm(forms.ModelForm):
             
             # Bezpečnostní kontrola typu souboru
             valid_extensions = ['image/jpeg', 'image/png', 'image/webp', 'image/gif']
-            if image.content_type not in valid_extensions:
+            if hasattr(image, 'content_type') and image.content_type not in valid_extensions:
                 raise ValidationError("Invalid file format. Only JPEG, PNG, WEBP, and GIF are allowed.")
                 
         return image
