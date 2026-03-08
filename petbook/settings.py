@@ -202,3 +202,10 @@ AUTHENTICATION_BACKENDS = [
     'users.backends.EmailOrUsernameModelBackend',
     'django.contrib.auth.backends.ModelBackend',
 ]
+
+# CELERY & REDIS NASTAVENÍ
+# Lokálně použije 'redis://localhost:6379/0', v produkci vezme REDIS_URL z .env
+CELERY_BROKER_URL = os.environ.get('REDIS_URL', 'redis://localhost:6379/0')
+CELERY_RESULT_BACKEND = CELERY_BROKER_URL
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'

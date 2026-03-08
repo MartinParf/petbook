@@ -3,6 +3,7 @@ from django.contrib.auth import login, logout
 from django_ratelimit.decorators import ratelimit
 from .forms import CustomUserCreationForm, CustomAuthenticationForm, UserProfileForm
 from django.contrib.auth.decorators import login_required
+from .tasks import send_welcome_email_task  # <-- Importujeme náš úkol
 
 # OMEZENÍ: Z jedné IP adresy max 5 pokusů o registraci za hodinu (Zastaví botnety)
 @ratelimit(key='ip', rate='5/h', block=True)
@@ -15,6 +16,10 @@ def register_view(request):
         if form.is_valid():
             user = form.save()
             
+            # MAGIE: Odpálíme úkol na pozadí! 
+            # Funkce okamžitě pokračuje dál, nečeká na výsledek.
+            send_welcome_email_task.delay(user.email, user.pet_name)
+
             # TADY JE TA OPRAVA: Natvrdo řekneme, jaký backend se má pro relaci použít
             login(request, user, backend='users.backends.EmailOrUsernameModelBackend')
             
