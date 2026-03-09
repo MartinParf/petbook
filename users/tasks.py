@@ -1,18 +1,27 @@
 from celery import shared_task
-import time
+from django.core.mail import send_mail
+from django.conf import settings
 
 @shared_task
 def send_welcome_email_task(user_email, pet_name):
     """
-    Tento úkol běží na pozadí, mimo hlavní Django vlákno.
+    Odešle skutečný uvítací e-mail na pozadí přes SMTP server.
     """
-    print(f"CELERY ZAČÍNÁ: Připravuji uvítací e-mail pro {pet_name} ({user_email})...")
+    subject = f'Vítejte v Petbooku, {pet_name}!'
+    message = (
+        f'Ahoj!\n\n'
+        f'Jsme nadšeni, že se tvůj mazlíček {pet_name} přidal k naší síti Petbook. '
+        f'Připrav se na spoustu sdílení, fotek a nových zvířecích přátel!\n\n'
+        f'Tým Petbook'
+    )
     
-    # Simulujeme zdržení (např. komunikace se SendGrid / Gmail serverem)
-    time.sleep(5) 
+    # Skutečné odeslání e-mailu (Django se postará o spojení s Gmailem/SMTP)
+    send_mail(
+        subject=subject,
+        message=message,
+        from_email=settings.EMAIL_HOST_USER,
+        recipient_list=[user_email],
+        fail_silently=False,  # Pokud to spadne, chceme vidět chybu v Sentry
+    )
     
-    # Tady v budoucnu bude skutečný kód pro odeslání e-mailu:
-    # send_mail(...)
-    
-    print(f"CELERY HOTOVO: E-mail úspěšně odeslán na {user_email}!")
-    return True
+    return f"E-mail úspěšně odeslán na {user_email}"
