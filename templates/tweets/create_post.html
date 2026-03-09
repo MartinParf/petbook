@@ -12,21 +12,46 @@
             <p class="text-stone-500 dark:text-stone-400">What is {{ request.user.pet_name|default:request.user.username }} up to?</p>
         </div>
 
-        <form method="POST" enctype="multipart/form-data" class="space-y-6">
+        <form method="POST" enctype="multipart/form-data" class="space-y-6" x-data="{ content: '', fileName: null }">
             {% csrf_token %}
             
-            {% for field in form %}
-            <div class="flex flex-col gap-1.5">
-                <label class="text-sm font-semibold text-stone-700 dark:text-stone-300 ml-1">{{ field.label }}</label>
-                {{ field }}
-                {% for error in field.errors %}
-                    <p class="text-sm text-red-500 ml-1">{{ error }}</p>
-                {% endfor %}
+            <div class="flex flex-col gap-2">
+                <textarea name="content" rows="4" required x-model="content" maxlength="280"
+                          placeholder="What is {{ request.user.pet_name|default:request.user.username }} thinking about today? ✨" 
+                          class="w-full bg-cream/50 dark:bg-softdark/50 border border-cream-dark dark:border-softdark-border rounded-2xl p-4 text-stone-800 dark:text-stone-200 text-lg resize-none focus:outline-none focus:ring-2 focus:ring-accent transition-all"></textarea>
+                
+                <div class="flex justify-end">
+                    <span class="text-sm font-medium transition-colors"
+                          :class="content.length > 260 ? 'text-red-500' : 'text-stone-400 dark:text-stone-500'"
+                          x-text="content.length + '/280'">
+                    </span>
+                </div>
             </div>
-            {% endfor %}
 
-            <button type="submit" class="w-full bg-accent hover:bg-accent-hover text-white font-bold py-3.5 px-6 rounded-xl shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all text-center block mt-4">
-                Publish Post
+            <div class="flex items-center justify-center w-full">
+                <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-cream-dark dark:border-softdark-border rounded-2xl cursor-pointer hover:bg-cream/50 dark:hover:bg-softdark/50 transition-colors group"
+                       :class="{ 'border-emerald-500 bg-emerald-50/50 dark:bg-emerald-900/10': fileName }">
+                    
+                    <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                        <svg x-show="!fileName" class="w-10 h-10 mb-3 text-stone-400 group-hover:text-accent transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
+                        
+                        <svg x-show="fileName" style="display: none;" class="w-10 h-10 mb-3 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        
+                        <p class="mb-2 text-sm text-stone-500 dark:text-stone-400 font-medium" x-show="!fileName">
+                            <span class="text-accent">Click to upload</span> an image
+                        </p>
+                        <p class="text-xs text-stone-400 dark:text-stone-500" x-show="!fileName">JPEG, PNG, WEBP up to 20MB</p>
+                        
+                        <p class="text-sm font-bold text-emerald-600 dark:text-emerald-400" x-show="fileName" x-text="fileName" style="display: none;"></p>
+                    </div>
+                    
+                    <input type="file" name="image" accept="image/*" class="hidden" @change="fileName = $event.target.files[0]?.name">
+                </label>
+            </div>
+
+            <button type="submit" :disabled="content.trim().length === 0" 
+                    class="w-full bg-accent hover:bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-3.5 px-8 rounded-full shadow-lg transform hover:-translate-y-1 transition-all text-lg mt-4">
+                Post to Feed ✨
             </button>
         </form>
     </div>

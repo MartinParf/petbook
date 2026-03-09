@@ -8,7 +8,7 @@ COMMON_INPUT_CLASSES = 'w-full bg-cream dark:bg-softdark border border-cream-dar
 class PostForm(forms.ModelForm):
     class Meta:
         model = Post
-        fields = ['title', 'content', 'image']
+        fields = ['content', 'image'] # Smazán 'title'
         
         widgets = {
             'title': forms.TextInput(attrs={'placeholder': 'Photo title (optional)'}),

@@ -16,7 +16,7 @@ def feed_view(request):
     # prefetch_related načte rovnou počet lajků a komentářů, aniž by zahltil databázi.
     posts = Post.objects.select_related('author').prefetch_related('likes', 'comments').all()
     
-    paginator = Paginator(posts, 3) # 3 příspěvky na stránku, změněno z 20
+    paginator = Paginator(posts, 5) # 5 příspěvky na stránku, změněno z 20
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     
