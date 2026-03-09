@@ -1,10 +1,13 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, logout
+from django.contrib.auth import get_user_model
 from django_ratelimit.decorators import ratelimit
 from .forms import CustomUserCreationForm, CustomAuthenticationForm, UserProfileForm
 from django.contrib.auth.decorators import login_required
 from .tasks import send_welcome_email_task  # <-- Importujeme náš úkol
+from django.db.models import Q
 
+User = get_user_model()
 # OMEZENÍ: Z jedné IP adresy max 5 pokusů o registraci za hodinu (Zastaví botnety)
 @ratelimit(key='ip', rate='5/h', block=True)
 def register_view(request):
@@ -68,3 +71,21 @@ def edit_profile_view(request):
         form = UserProfileForm(instance=request.user)
         
     return render(request, 'users/edit_profile.html', {'form': form})
+
+# Dolů přidej nové view:
+@login_required(login_url='users:login')
+@ratelimit(key='user', rate='30/m', block=True)
+def search_users_view(request):
+    query = request.GET.get('q', '').strip()
+    users = []
+    
+    if query:
+        # Vyhledá uživatele, kde uživatelské jméno NEBO jméno mazlíčka obsahuje hledaný text
+        users = User.objects.filter(
+            Q(username__icontains=query) | Q(pet_name__icontains=query)
+        ).exclude(id=request.user.id)[:10]  # Vyloučíme sami sebe a omezíme na 10 výsledků
+        
+    return render(request, 'users/search_results.html', {
+        'users': users,
+        'query': query
+    })

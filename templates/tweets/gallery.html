@@ -120,8 +120,23 @@
                     <span class="flex items-center gap-1"><svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M21.99 4c0-1.1-.89-2-1.99-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14l4 4-.01-18z"/></svg>{{ post.comments.count }}</span>
                 </div>
             </div>
-        {% empty %}
-            <div class="col-span-full text-center py-12 text-stone-500"><p class="text-xl">No photos yet.</p></div>
+            {% empty %}
+            <div class="col-span-full flex flex-col items-center justify-center py-20 text-center bg-white dark:bg-softdark-light rounded-3xl border border-dashed border-cream-dark dark:border-softdark-border">
+                <div class="text-7xl mb-4 opacity-80">🐕</div>
+                <h3 class="text-2xl font-bold text-stone-800 dark:text-stone-200 mb-2">No photos yet!</h3>
+                <p class="text-stone-500 dark:text-stone-400 max-w-sm mx-auto mb-6">
+                    {% if request.user == target_user %}
+                        Your gallery is waiting for its first masterpiece. Share a moment with the world!
+                    {% else %}
+                        {{ target_user.pet_name|default:target_user.username }} hasn't posted any photos yet.
+                    {% endif %}
+                </p>
+                {% if request.user == target_user %}
+                    <a href="{% url 'tweets:create_post' %}" class="bg-accent hover:bg-accent-hover text-white font-semibold py-2.5 px-6 rounded-full shadow-md transition-all">
+                        + Upload Photo
+                    </a>
+                {% endif %}
+            </div>
         {% endfor %}
     </div>
 

@@ -11,4 +11,6 @@ urlpatterns = [
     
     # NOVÉ: Cesta k úpravě profilu
     path('profile/edit/', views.edit_profile_view, name='edit_profile'),
+    # NOVÉ: Cesta pro vyhledávání
+    path('search/', views.search_users_view, name='search'),
 ]
