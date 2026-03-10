@@ -6,6 +6,7 @@ from .forms import CustomUserCreationForm, CustomAuthenticationForm, UserProfile
 from django.contrib.auth.decorators import login_required
 from .tasks import send_welcome_email_task  # <-- Importujeme náš úkol
 from django.db.models import Q
+from django.contrib import messages
 
 User = get_user_model()
 # OMEZENÍ: Z jedné IP adresy max 5 pokusů o registraci za hodinu (Zastaví botnety)
@@ -43,6 +44,8 @@ def login_view(request):
         if form.is_valid():
             user = form.get_user()
             login(request, user)
+            # PŘIDÁNO: Zelená bublina po přihlášení
+            messages.success(request, f"Welcome back, {user.pet_name or user.username}! 🦴")
             return redirect('tweets:feed')
     else:
         form = CustomAuthenticationForm()
@@ -52,6 +55,8 @@ def login_view(request):
 # Odhlášení
 def logout_view(request):
     logout(request)
+    # PŘIDÁNO: Info bublina po odhlášení
+    messages.info(request, "You have been logged out. See you soon! 👋")
     return redirect('tweets:feed')
 
 # 1. Musí být přihlášen
@@ -65,6 +70,8 @@ def edit_profile_view(request):
         form = UserProfileForm(request.POST, request.FILES, instance=request.user)
         if form.is_valid():
             form.save()
+            # PŘIDÁNO: Zelená bublina po uložení profilu
+            messages.success(request, "Profile successfully updated! 🐾")
             # Přesměrujeme ho do jeho vlastní galerie
             return redirect('tweets:user_gallery', username=request.user.username)
     else:
@@ -82,7 +89,9 @@ def search_users_view(request):
     if query:
         # Vyhledá uživatele, kde uživatelské jméno NEBO jméno mazlíčka obsahuje hledaný text
         users = User.objects.filter(
-            Q(username__icontains=query) | Q(pet_name__icontains=query)
+            # Q(username__icontains=query) | Q(pet_name__icontains=query)  #Místno původního
+            # Změň na toto:
+            Q(username__unaccent__icontains=query) | Q(pet_name__unaccent__icontains=query)
         ).exclude(id=request.user.id)[:10]  # Vyloučíme sami sebe a omezíme na 10 výsledků
         
     return render(request, 'users/search_results.html', {

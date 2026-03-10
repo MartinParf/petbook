@@ -6,6 +6,7 @@ from django_ratelimit.decorators import ratelimit
 from django.contrib.auth import get_user_model
 from .models import Post, Like, Comment
 from .forms import PostForm
+from django.contrib import messages
 
 User = get_user_model()
 
@@ -51,6 +52,8 @@ def create_post_view(request):
             new_post = form.save(commit=False)
             new_post.author = request.user
             new_post.save()
+            # PŘIDÁNO: Bublina po vydání příspěvku
+            messages.success(request, "Your moment has been shared! ✨")
             
             # Pokud nahrál obrázek, přesměrujeme ho do jeho galerie, jinak na zeď
             #if new_post.image:
@@ -94,7 +97,21 @@ def delete_post_view(request, post_id):
     
     if request.method == 'POST':
         post.delete()
+        # PŘIDÁNO: Bublina po smazání
+        messages.error(request, "Post has been deleted.") # Používáme error pro červenou barvu koše
         # Přesměruje uživatele zpět tam, odkud smazání odklikl (Zeď nebo Galerie)
         return redirect(request.META.get('HTTP_REFERER', 'tweets:feed'))
         
     return redirect('tweets:feed')
+
+@login_required(login_url='users:login')
+def delete_comment_view(request, comment_id):
+    # Najde komentář, ale pouze pokud patří aktuálně přihlášenému uživateli
+    comment = get_object_or_404(Comment, id=comment_id, author=request.user)
+    
+    if request.method == 'POST':
+        comment.delete()
+        # Použijeme červenou (error) bublinu pro smazání
+        messages.error(request, "Comment has been deleted. 🗑️")
+        
+    return redirect(request.META.get('HTTP_REFERER', 'tweets:feed'))

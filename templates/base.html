@@ -12,6 +12,8 @@
     <title>PetBook | {% block title %}Welcome{% endblock %}</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐱</text></svg>">
 
+    <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/intersect@3.x.x/dist/cdn.min.js"></script>
+    
     <script src="https://cdn.tailwindcss.com"></script>
     
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
@@ -98,8 +100,16 @@
              x-transition:leave-start="opacity-100 translate-y-0"
              x-transition:leave-end="opacity-0 -translate-y-4"
              @click.away="mobileMenuOpen = false"
-             class="md:hidden mt-2 bg-white/95 dark:bg-softdark-light/95 backdrop-blur-md border border-cream-dark dark:border-softdark-border rounded-2xl shadow-lg p-4 flex flex-col gap-3 font-medium text-center">
+             class="md:hidden mt-2 bg-white/95 dark:bg-softdark-light/95 backdrop-blur-md border border-cream-dark dark:border-softdark-border rounded-2xl shadow-lg p-4 flex flex-col gap-3 font-medium text-center"
+             style="display: none;">
             
+            <form action="{% url 'users:search' %}" method="GET" class="relative w-full mb-1">
+                <input type="text" name="q" placeholder="Search pets..." required
+                       class="w-full bg-cream/50 dark:bg-softdark/50 border border-cream-dark dark:border-softdark-border rounded-xl py-2.5 pl-4 pr-10 text-base focus:outline-none focus:ring-2 focus:ring-accent transition-all text-stone-800 dark:text-stone-200">
+                <button type="submit" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-stone-400 hover:text-accent p-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                </button>
+            </form>
             <a href="{% url 'tweets:feed' %}" class="block px-4 py-3 rounded-xl transition-colors {% if request.resolver_match.url_name == 'feed' %}bg-accent/10 text-accent font-bold{% else %}hover:bg-cream-dark dark:hover:bg-softdark{% endif %}">Feed</a>
             
             {% if request.user.is_authenticated %}
@@ -156,6 +166,27 @@
     </div>
     {% endif %}
 
+{% if not request.user.is_authenticated %}
+    <div x-data="{ show: false }" 
+         @scroll.window="show = window.pageYOffset > 300"
+         x-show="show"
+         x-transition:enter="transition ease-out duration-500"
+         x-transition:enter-start="opacity-0 translate-y-full"
+         x-transition:enter-end="opacity-100 translate-y-0"
+         class="fixed bottom-0 left-0 w-full bg-white/95 dark:bg-softdark-light/95 backdrop-blur-lg border-t border-cream-dark dark:border-softdark-border p-4 shadow-2xl z-40"
+         style="display: none;">
+        <div class="max-w-4xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-center md:text-left">
+            <div>
+                <h3 class="text-xl font-extrabold text-stone-900 dark:text-white">Don't miss out on the cuteness! 🐾</h3>
+                <p class="text-stone-500 dark:text-stone-400 text-sm md:text-base">Join PetBook today to like, comment, and share your own pet's moments.</p>
+            </div>
+            <div class="flex gap-3 whitespace-nowrap">
+                <a href="{% url 'users:login' %}" class="px-5 py-2.5 rounded-full font-bold text-accent bg-accent/10 hover:bg-accent/20 transition-colors">Log In</a>
+                <a href="{% url 'users:register' %}" class="px-5 py-2.5 rounded-full font-bold text-white bg-accent hover:bg-accent-hover shadow-lg transition-transform hover:-translate-y-0.5">Sign Up Free</a>
+            </div>
+        </div>
+    </div>
+{% endif %}
 
     <button x-data="{ show: false }" 
             @scroll.window="show = window.pageYOffset > 400" 
